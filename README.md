@@ -1,7 +1,7 @@
 # arduino-cbyg
 Arduino project to check temperature and send it to one MQTT broker.  
 
-### Arduino project for my home rack
+### Arduino project to meassure temp in my home rack
 Arduino Uno board project that check the temperature of my home rack and send it to one MQTT broker.  
 Extra - Optionally it will turn on a light with a motion sensor when my home rack door is opened.  
 Compiled with `arduino-mk` linux package.  
