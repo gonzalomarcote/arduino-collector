@@ -1,4 +1,4 @@
-# arduino-cbyg
+# arduino-collector
 Arduino project to check temperature and send it to one MQTT broker.  
 
 ### Arduino project to meassure temp in my home rack
