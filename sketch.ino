@@ -1,4 +1,4 @@
-/* Sketch - CBYG Temp Sensor Poject - V. 1.0
+/* Sketch - arduino-collector - Temperature Sensor Poject - V 1.0
 Author: Gonzo - gonzalomarcote@gmail.com
 */
 
@@ -9,16 +9,12 @@ Author: Gonzo - gonzalomarcote@gmail.com
 #include <WiFiUdp.h>
 #include <Time.h>
 #include <Timezone.h>
-#include <LiquidCrystal.h>
 
 // ledPin setup
 const int ledPin = 9;
 
 // PIR setup
 byte sensorPin = 6;
-
-// LCD setup
-LiquidCrystal lcd(10, 8, 5, 4, 3, 2);
 
 // Web service
 char server[] = "www.google.com";
@@ -130,13 +126,9 @@ void setup() {
   // Set PIR pin in
   pinMode(sensorPin,INPUT);
 
-  // Set LCD
-  lcd.begin(16, 2);
-
   // Welcome message
-  Serial.println("== Welcome to CBYG Temp sensor 1.0 ==");
+  Serial.println("=== Welcome to arduino-collector Temp sensor 1.0 ===");
   Serial.println("");
-
 
   // We connect to Wifi only on Arduino boot
   // Wifi setup
@@ -247,21 +239,12 @@ void loop() {
   digitalWrite(ledPin, state);
 
   if(state == 1) {
-    Serial.println("Door open. Turn on LCD and light");
+    Serial.println("Door open. Turn on light");
     digitalWrite(ledPin, state);
-    // Turn on the display
-    lcd.display();
-    delay(500);
-    lcd.setCursor(0, 0);
-    lcd.print("  CBYG - Rack");
-    lcd.setCursor(0, 1);
-    lcd.print("R:40  B:42  P:32");
     delay(30000);
   }
   else if(state == 0) {
-    Serial.println("Door closed. Turn off LCD and light");
-    // Turn off the display
-    lcd.noDisplay();
+    Serial.println("Door closed. Turn off light");
     delay(500);
   }
 
