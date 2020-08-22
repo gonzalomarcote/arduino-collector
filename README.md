@@ -14,7 +14,6 @@ The following libraries need to be downloaded to `/usr/share/arduino/libraries/`
 * WiFi
 * SPI
 * Time
-* TimeAlarms
 * Timezone
 
 To upload `skecth.ino` sketch to arduino uno board just type:

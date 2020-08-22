@@ -8,8 +8,6 @@ ARDUINO_LIBS 		+= Wire \
 			   WiFi \
                 	   SPI \
                 	   Time \
-			   TimeAlarms \
-			   Timezone \
-			   LiquidCrystal
+			   Timezone 
 
 include /usr/share/arduino/Arduino.mk
