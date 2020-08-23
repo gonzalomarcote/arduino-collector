@@ -10,8 +10,11 @@ Author: Gonzo - gonzalomarcote@gmail.com
 #include <Time.h>
 #include <Timezone.h>
 
-// ledPin setup
+// Led setup
 const int ledPin = 9;
+
+// TMP36 setup
+const int tmpPin = 0;
 
 // PIR setup
 byte sensorPin = 6;
@@ -28,7 +31,7 @@ int status = WL_IDLE_STATUS;	// Wifi status
 WiFiClient client;
 
 // Network setup
-IPAddress ip(192, 168, 1, 156);
+IPAddress ip(192, 168, 1, 114);
 IPAddress dns(192, 168, 1, 254);
 IPAddress gateway(192, 168, 1, 1);
 IPAddress subnet(255, 255, 255, 0);
@@ -234,6 +237,16 @@ void setup() {
 
 void loop() {
 
+  // Getting the voltage reading from the temperature sensor
+  int reading = analogRead(sensorPin);
+  float voltage = reading * 5.0;
+  voltage /= 1024.0;
+  Serial.print(voltage); Serial.println(" volts");
+
+  // Print out the temperature
+  float temperature = (voltage - 0.5) * 100 ;
+  Serial.print(temperature); Serial.println(" ºC");
+
   // Read motion sensor
   byte state = digitalRead(sensorPin);
   digitalWrite(ledPin, state);
@@ -262,7 +275,7 @@ void loop() {
   //  Serial.println("disconnecting from server.");
   //  client.stop();
 
-    // do nothing forevermore:
+  // do nothing forevermore:
   //  while (true);
   //}
 
