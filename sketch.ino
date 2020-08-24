@@ -117,6 +117,20 @@ void print2digits(int number) {
   Serial.print(number);
 }
 
+// Function to get TMP36 temperature
+float tmp36() {
+  // Getting the voltage reading from the temperature sensor
+  int reading = analogRead(tmpPin);
+  float voltage = reading * 5.0;
+  voltage /= 1024.0;
+  //Serial.print(voltage); Serial.println(" volts");
+
+  // Calculate the temperature
+  float temperature = (voltage - 0.5) * 100 ;
+  return temperature;
+  //Serial.print(temperature); Serial.println(" ºC");
+}
+
 
 void setup() {
   
@@ -237,28 +251,33 @@ void setup() {
 
 void loop() {
 
-  // Getting the voltage reading from the temperature sensor
-  int reading = analogRead(sensorPin);
-  float voltage = reading * 5.0;
-  voltage /= 1024.0;
-  Serial.print(voltage); Serial.println(" volts");
-
-  // Print out the temperature
-  float temperature = (voltage - 0.5) * 100 ;
-  Serial.print(temperature); Serial.println(" ºC");
-
   // Read motion sensor
   byte state = digitalRead(sensorPin);
   digitalWrite(ledPin, state);
 
   if(state == 1) {
-    Serial.println("Door open. Turn on light");
-    digitalWrite(ledPin, state);
-    delay(30000);
+
+    int x = 0;
+    for (x = 0; x < 60; x ++) {
+      // Door opened
+      Serial.println("Door open. Turn on light");
+      digitalWrite(ledPin, state);
+
+      // Print out the temperature
+      Serial.print(tmp36()); Serial.println(" ºC");
+
+      delay(1000);
+    }
   }
+
   else if(state == 0) {
+    // Door closed
     Serial.println("Door closed. Turn off light");
-    delay(500);
+
+    // Print out the temperature
+    Serial.print(tmp36()); Serial.println(" ºC");
+
+    delay(1000);
   }
 
   // if there are incoming bytes available
@@ -267,7 +286,6 @@ void loop() {
   //  char c = client.read();
   //  Serial.write(c);
   //}
-
 
   // if the server's disconnected, stop the client:
   //if (!client.connected()) {
