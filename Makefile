@@ -8,6 +8,7 @@ ARDUINO_LIBS 		+= Wire \
 			   WiFi \
                 	   SPI \
                 	   Time \
-			   Timezone 
+			   Timezone \
+			   Pubsubclient
 
 include /usr/share/arduino/Arduino.mk

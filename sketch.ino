@@ -3,12 +3,13 @@ Author: Gonzo - gonzalomarcote@gmail.com
 */
 
 
-// Libraries to connect to SPI, Wifi, WiFiUDP, Time
+// Libraries to connect to SPI, Wifi, WiFiUDP, Time and Pubsubclient
 #include <SPI.h>
 #include <WiFi.h>
 #include <WiFiUdp.h>
 #include <Time.h>
 #include <Timezone.h>
+#include <PubSubClient.h>
 
 // Led setup
 const int ledPin = 9;
@@ -19,16 +20,13 @@ const int tmpPin = 0;
 // PIR setup
 byte sensorPin = 6;
 
-// Web service
-char server[] = "www.google.com";
+// Counter variable
+int count = 0;
 
 // Wifi setup
 char ssid[] = "cbyg";		// Wifi SSID name
 char pass[] = "1019goN$44";	// Wifi password
 int status = WL_IDLE_STATUS;	// Wifi status
-
-// Initialize the Wifi client library
-WiFiClient client;
 
 // Network setup
 IPAddress ip(192, 168, 1, 114);
@@ -37,6 +35,14 @@ IPAddress gateway(192, 168, 1, 1);
 IPAddress subnet(255, 255, 255, 0);
 IPAddress checkIp;			// Variable to store IP address
 IPAddress checkGateway;			// Variable to store IP gateway
+
+// MQTT server setup
+IPAddress mqtt_server(192, 168, 1, 100);
+const char* topicName = "test";
+
+// Initialize the Wifi client and PubSub client libraries
+WiFiClient client;
+PubSubClient pubClient(client);
 
 // NTP setup
 unsigned int localPort = 8888;		// local port to listen for UDP packets
@@ -100,7 +106,7 @@ unsigned long getNtpTime() {
     unsigned long epoch = secsSince1900 - seventyYears;
     Serial.println("Time synced with NTP server!");
     Serial.println("");
-    Serial.println("Updating local Time with NTP...");
+    Serial.println("Updating local Time with NTP ...");
     // print Unix time
     return epoch;
     
@@ -153,14 +159,14 @@ void setup() {
   Serial.println("Connecting to Wifi ...");
   status = WiFi.begin(ssid, pass);          // Trying to connect to wifi using WPA2 encryption
 
-  // Failed wifi connection
+  // Failed wWiFi connection
   if ( status != WL_CONNECTED) { 
     Serial.println("ERROR: Failed to connect to Wifi!");
     Serial.println("");
     while(true);
   }
 
-  // Succesfully connected:
+  // Succesfully WiFi connection
   else {
     Serial.println("Connected to Wifi network!");
     // Print IP & Gateway addresses:
@@ -178,14 +184,31 @@ void setup() {
     Udp.begin(localPort);
   }
 
+  // After connecting to wifi we initialize MQTT server
+  pubClient.setServer(mqtt_server, 1883);
+
+  // Connect to MQTT broker if disconnected
+  Serial.println("Connecting to MQTT broker.marcote.org ...");
+  pubClient.connect("Arduino Collector 1");
+
+  // Failed MQTT connection
+  if (!pubClient.connected()) {
+    Serial.println("ERROR: Failed to connect to MQTT!");
+    Serial.println("");
+  }
+
+  // Succesfully MQTT connection
+  else {
+    Serial.println("Connected to MQTT broker.marcote.org!");
+    Serial.println("");
+  }
+
   // After connecting to wifi we check time with NTP protocol
   Serial.println("Connecting to NTP server ...");
   setSyncProvider(getNtpTime);
 
   if (timeStatus() == 2) {
     Serial.println("Local time updated with NTP!");
-    Serial.print("Update status is: ");
-    Serial.println(timeStatus());
   } else {
     Serial.println("ERROR. Local time not updated with NTP");
     Serial.print("Update status is: ");
@@ -233,18 +256,6 @@ void setup() {
   // End setup
   Serial.println("");
   Serial.println("===========================");
-  Serial.println("");
-
-  Serial.println("\nStarting connection to server...");
-  // if you get a connection, report back via serial:
-  if (client.connect(server, 80)) {
-    Serial.println("Connected to server");
-    // Make a HTTP request:
-    client.println("GET /search?q=arduino HTTP/1.1");
-    client.println("Host: www.google.com");
-    client.println("Connection: close");
-    client.println();
-  }
 
 }
 
@@ -254,6 +265,30 @@ void loop() {
   // Read motion sensor
   byte state = digitalRead(sensorPin);
   digitalWrite(ledPin, state);
+
+  // Send data to MQTT broker every 60 seconds
+  if (count >= 60) {
+    // Connect to MQTT broker if disconnected
+    if (!pubClient.connected()) {
+      Serial.println("Connection to MQTT expired. Connecting to MQTT broker.marcote.org ...");
+      pubClient.connect("Arduino Collector 1");
+      float temp = tmp36();
+      char buffer[10];
+      dtostrf(temp, 4, 2, buffer);
+      pubClient.publish(topicName, buffer);
+    }
+
+    // Publish to MQTT broker
+    else {
+      float temp = tmp36();
+      char buffer[10];
+      dtostrf(temp, 4, 2, buffer);
+      pubClient.publish(topicName, buffer);
+    }
+
+    // Set count to 0
+    count = 0;
+  }
 
   if(state == 1) {
 
@@ -267,6 +302,8 @@ void loop() {
       Serial.print(tmp36()); Serial.println(" ºC");
 
       delay(1000);
+      count ++;
+      Serial.println(count);
     }
   }
 
@@ -278,23 +315,8 @@ void loop() {
     Serial.print(tmp36()); Serial.println(" ºC");
 
     delay(1000);
+    count ++;
+    Serial.println(count);
   }
-
-  // if there are incoming bytes available
-  // from the server, read them and print them:
-  //while (client.available()) {
-  //  char c = client.read();
-  //  Serial.write(c);
-  //}
-
-  // if the server's disconnected, stop the client:
-  //if (!client.connected()) {
-  //  Serial.println();
-  //  Serial.println("disconnecting from server.");
-  //  client.stop();
-
-  // do nothing forevermore:
-  //  while (true);
-  //}
 
 }
