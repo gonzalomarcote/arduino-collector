@@ -28,3 +28,8 @@ To connect to serial type:
 $ screen /dev/ttyACM0 115200
 ```
 Be sure to have in `Serial.begin(115200)` the same serial number. 
+
+### MQTT broker auth configuration
+Edit `skecth.ino` and specify user and passwords in the following lines (2):
+
+    pubClient.connect("Arduino Collector 1", "user", "passwd");

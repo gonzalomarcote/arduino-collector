@@ -37,7 +37,8 @@ IPAddress checkIp;			// Variable to store IP address
 IPAddress checkGateway;			// Variable to store IP gateway
 
 // MQTT server setup
-IPAddress mqtt_server(192, 168, 1, 100);
+//IPAddress mqtt_server(192, 168, 1, 100);
+char mqtt_server[] = "razor.cbyg.marcote.org";
 const char* topicName = "test";
 
 // Initialize the Wifi client and PubSub client libraries
@@ -189,7 +190,7 @@ void setup() {
 
   // Connect to MQTT broker if disconnected
   Serial.println("Connecting to MQTT broker.marcote.org ...");
-  pubClient.connect("Arduino Collector 1");
+  pubClient.connect("Arduino Collector 1", "user", "passwd");
 
   // Failed MQTT connection
   if (!pubClient.connected()) {
@@ -271,7 +272,7 @@ void loop() {
     // Connect to MQTT broker if disconnected
     if (!pubClient.connected()) {
       Serial.println("Connection to MQTT expired. Connecting to MQTT broker.marcote.org ...");
-      pubClient.connect("Arduino Collector 1");
+      pubClient.connect("Arduino Collector 1", "user", "passwd");
       float temp = tmp36();
       char buffer[10];
       dtostrf(temp, 4, 2, buffer);
