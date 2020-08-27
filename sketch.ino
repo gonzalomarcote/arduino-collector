@@ -38,7 +38,7 @@ IPAddress checkGateway;			// Variable to store IP gateway
 
 // MQTT server setup
 //IPAddress mqtt_server(192, 168, 1, 100);
-char mqtt_server[] = "razor.cbyg.marcote.org";
+char mqtt_server[] = "broker.cbyg.marcote.org";
 const char* topicName = "test";
 
 // Initialize the Wifi client and PubSub client libraries
