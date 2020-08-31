@@ -37,9 +37,8 @@ IPAddress checkIp;			// Variable to store IP address
 IPAddress checkGateway;			// Variable to store IP gateway
 
 // MQTT server setup
-//IPAddress mqtt_server(192, 168, 1, 100);
 char mqtt_server[] = "broker.cbyg.marcote.org";
-const char* topicName = "test";
+const char* topicName = "collector1";
 
 // Initialize the Wifi client and PubSub client libraries
 WiFiClient client;
@@ -186,10 +185,10 @@ void setup() {
   }
 
   // After connecting to wifi we initialize MQTT server
-  pubClient.setServer(mqtt_server, 1883);
+  pubClient.setServer(mqtt_server, 30583);
 
   // Connect to MQTT broker if disconnected
-  Serial.println("Connecting to MQTT broker.marcote.org ...");
+  Serial.println("Connecting to MQTT broker.cbyg.marcote.org ...");
   pubClient.connect("Arduino Collector 1", "user", "passwd");
 
   // Failed MQTT connection
@@ -200,7 +199,7 @@ void setup() {
 
   // Succesfully MQTT connection
   else {
-    Serial.println("Connected to MQTT broker.marcote.org!");
+    Serial.println("Connected to MQTT broker.cbyg.marcote.org!");
     Serial.println("");
   }
 
@@ -215,23 +214,6 @@ void setup() {
     Serial.print("Update status is: ");
     Serial.println(timeStatus());
   }
-
-  /*
-  Serial.print("Local Date and Time updated with NTP is: ");
-  time_t t = now();
-  Serial.print(day(t));
-  Serial.print(+ "/") ;
-  Serial.print(month(t));
-  Serial.print(+ "/") ;
-  Serial.print(year(t)); 
-  Serial.print( " ") ;
-  Serial.print(hour(t));  
-  Serial.print(+ ":") ;
-  Serial.print(minute(t));
-  Serial.print(":") ;
-  Serial.println(second(t));
-  */
-
 
   // We update the current Time and Date with DST
   time_t central, utc;
@@ -271,7 +253,7 @@ void loop() {
   if (count >= 60) {
     // Connect to MQTT broker if disconnected
     if (!pubClient.connected()) {
-      Serial.println("Connection to MQTT expired. Connecting to MQTT broker.marcote.org ...");
+      Serial.println("Connection to MQTT expired. Connecting to MQTT broker.cbyg.marcote.org ...");
       pubClient.connect("Arduino Collector 1", "user", "passwd");
       float temp = tmp36();
       char buffer[10];
